@@ -1,4 +1,4 @@
-const scroe = document.querySelector('.score'),
+const score = document.querySelector('.score'),
     start = document.querySelector('.start'),
     gameArea = document.querySelector('.gameArea'),
     car = document.createElement('div');
@@ -31,6 +31,11 @@ console.log(getQuantityElements(50));
 
 function startGame(){
     start.classList.add('hide');
+    // difficulty1.classList.remove('hide');
+    // difficulty2.classList.remove('hide');
+    // difficulty3.classList.remove('hide');
+    gameArea.innerHTML = '';
+    
 
     for (let i = 0; i < getQuantityElements(100); i++) {
         const line = document.createElement('div');
@@ -49,15 +54,20 @@ function startGame(){
         enemy.style.background = 'transparent url(./image/enemy.png) center / cover no-repeat';
         gameArea.appendChild(enemy);
     }
-
+    setting.score = 0;
     setting.start = true;
     gameArea.appendChild(car);
+    car.style.left = gameArea.offsetWidth / 2 - car.offsetWidth / 2;
+    car.style.top = 'auto';
+    car.style.bottom = '10px';
     setting.x = car.offsetLeft;
     setting.y = car.offsetTop;
     requestAnimationFrame(playGame);
 }
 
 function playGame(){
+    setting.score += setting.speed;
+    score.innerHTML = 'Очки:<br>' + setting.score;
     if (setting.start){
         moveRoad();
         moveEnemy();
@@ -110,6 +120,18 @@ function moveRoad() {
 function moveEnemy(){
     let enemy = document.querySelectorAll('.enemy');
     enemy.forEach(function(enemyCar){
+        let carRect = car.getBoundingClientRect();
+        let enemyRect = enemyCar.getBoundingClientRect();
+
+        if(carRect.top <= enemyRect.bottom &&
+            carRect.right >= enemyRect.left &&
+            carRect.left <= enemyRect.right &&
+            carRect.bottom >= enemyRect.top){
+                setting.start = false;
+                console.warn('ДТП');
+                start.classList.remove('hide');
+                start.style.top = score.offsetHeight;
+        }
         enemyCar.y += setting.speed / 1.5;
         enemyCar.style.top = enemyCar.y + 'px';
 
